@@ -43,33 +43,45 @@ def get_main_inputs():
 
 def get_model_parameters():
 
-    left, right =  st.columns(2, gap="medium")
+    # left, right =  st.columns(2, gap="medium")
 
-    with left:
-        fee_30 = st.slider("Taxa para prazo 60 dias", min_value=-1.0, max_value=10.0, step=0.1, value=3., format="%f %%")
-        fee_60 = st.slider("Taxa para prazo 60 dias", min_value=-1.0, max_value=10.0, step=0.1, value=3.8, format="%f %%")
-        fee_90 = st.slider("Taxa para prazo 90 dias", min_value=-1.0, max_value=10.0, step=0.1, value=3.6, format="%f %%")
-        taxa_apr_novos = st.slider("Taxa de Aprovação Novos", min_value=-1.0, max_value=10.0, step=0.1, value=0.6, format="%f %%")
-        taxa_apr_recus = st.slider("Taxa de Aprovação Recusados", min_value=-1.0, max_value=10.0, step=0.1, value=0.3, format="%f %%")
+    # with left:
+    #     fee_30 = st.slider("Taxa para prazo 60 dias", min_value=-1.0, max_value=10.0, step=0.1, value=3., format="%f %%")
+    #     fee_60 = st.slider("Taxa para prazo 60 dias", min_value=-1.0, max_value=10.0, step=0.1, value=3.8, format="%f %%")
+    #     fee_90 = st.slider("Taxa para prazo 90 dias", min_value=-1.0, max_value=10.0, step=0.1, value=4.6, format="%f %%")
+    #     taxa_apr_novos = st.slider("Taxa de Aprovação Novos", min_value=-1.0, max_value=10.0, step=0.1, value=0.6, format="%f %%")
+    #     taxa_apr_recus = st.slider("Taxa de Aprovação Recusados", min_value=-1.0, max_value=10.0, step=0.1, value=0.3, format="%f %%")
 
-    with right:
-        peso_custo_produto = st.number_input("Peso para Custos de Produto", value=10)
-        peso_custo_operacao = st.number_input("Peso para Custos Operacionais", value=3)
-        peso_outros_custos = st.number_input("Peso para Outros Custos", value=1)
-        meses_para_pnl =  st.number_input("Meses para PnL", value=12)
+    # with right:
+    #     peso_custo_produto = st.number_input("Peso para Custos de Produto", value=10)
+    #     peso_custo_operacao = st.number_input("Peso para Custos Operacionais", value=3)
+    #     peso_outros_custos = st.number_input("Peso para Outros Custos", value=1)
+    #     meses_para_pnl =  st.number_input("Meses para PnL", value=12)
 
     
 
-    return {
-        "fee_30": fee_30,
-        "fee_60": fee_60,
-        "fee_90": fee_90,
-        "peso_custo_produto": peso_custo_produto,
-        "peso_custo_operacao": peso_custo_operacao,
-        "peso_outros_custos": peso_outros_custos,
-        "taxa_apr_novos": taxa_apr_novos,
-        "taxa_apr_recus": taxa_apr_recus,
-        "meses_para_pnl": meses_para_pnl
+    # return {
+    #     "fee_30": fee_30,
+    #     "fee_60": fee_60,
+    #     "fee_90": fee_90,
+    #     "peso_custo_produto": peso_custo_produto,
+    #     "peso_custo_operacao": peso_custo_operacao,
+    #     "peso_outros_custos": peso_outros_custos,
+    #     "taxa_apr_novos": taxa_apr_novos,
+    #     "taxa_apr_recus": taxa_apr_recus,
+    #     "meses_para_pnl": meses_para_pnl
+    # }
+
+        return {
+        "fee_30": 3,
+        "fee_60": 3.8,
+        "fee_90": 4.6,
+        "peso_custo_produto": 10,
+        "peso_custo_operacao": 3,
+        "peso_outros_custos": 1,
+        "taxa_apr_novos": 0.6,
+        "taxa_apr_recus": 0.3,
+        "meses_para_pnl": 12
     }
 
 def calculate_results():
@@ -246,62 +258,64 @@ st.columns(3)[1].title("Calculadora&nbsp;Tino")
 # st.write(f"IP Address: {ip_address}")
 
 #main tab with inputs and results, mp_tab with model parameters
-main_tab, mp_tab = st.tabs(["Principal", "Parâmetros modelo"])
+# main_tab, mp_tab = st.tabs(["Principal", "Parâmetros modelo"])
 
-with mp_tab:
+# with mp_tab:
 
-    params = get_model_parameters()
+    
     # st.write(params['fee_30'])
 
-with main_tab:
+# with main_tab:
 
-    with st.form("my_form"):
-        res = get_main_inputs()
-        # st.write(res['client_base'])
+params = get_model_parameters()
 
-        calc = calculate_results()
-        # st.write(params['fee_30'])
+with st.form("my_form"):
+    res = get_main_inputs()
+    # st.write(res['client_base'])
 
-        submitted = st.columns(5)[2].form_submit_button("Calcule&nbsp;Seus&nbsp;Resultados")
+    calc = calculate_results()
+    # st.write(params['fee_30'])
 
-        
+    submitted = st.columns(5)[2].form_submit_button("Calcule&nbsp;Seus&nbsp;Resultados")
 
-        fig = go.Figure()
+    
 
-        bau_rev = calc["BAU"].iloc[0]
-        new_rev = calc["Total"].iloc[0]
+    fig = go.Figure()
 
-        bau_margin = calc["BAU"].iloc[-1] / calc["BAU"].iloc[0]
-        new_margin = calc["Total"].iloc[-1] / calc["Total"].iloc[0]
+    bau_rev = calc["BAU"].iloc[0]
+    new_rev = calc["Total"].iloc[0]
 
-        
+    bau_margin = calc["BAU"].iloc[-1] / calc["BAU"].iloc[0]
+    new_margin = calc["Total"].iloc[-1] / calc["Total"].iloc[0]
 
-        if submitted:
-            st.columns(5)[2].subheader("Resultados")
+    
 
-            fig.add_trace(go.Indicator(
-                mode = "number+delta",
-                delta = {'reference': round(bau_rev, 3), 'prefix': "R$ "},
-                value = round(new_rev, 3),
-                number = {'prefix': "R$ "},
-                domain = {'row': 0, 'column': 0},
-                title="Receita Final"),
-            )
+    if submitted:
+        st.columns(5)[2].subheader("Resultados")
 
-            fig.add_trace(go.Indicator(
-                mode = "number+delta",
-                delta = {'reference': round(100 * bau_margin, 3), 'suffix': " p.p."},
-                value = round(100 * new_margin, 3),
-                number = {'suffix': " %"},
-                domain = {'row': 0, 'column': 1},
-                title="Margem Líquida Final"),
-            )
+        fig.add_trace(go.Indicator(
+            mode = "number+delta",
+            delta = {'reference': round(bau_rev, 3), 'prefix': "R$ "},
+            value = round(new_rev, 3),
+            number = {'prefix': "R$ "},
+            domain = {'row': 0, 'column': 0},
+            title="Receita Final"),
+        )
 
-            fig.update_layout(
-             grid = {'rows': 2, 'columns': 2, 'pattern': "independent"},
-            )
+        fig.add_trace(go.Indicator(
+            mode = "number+delta",
+            delta = {'reference': round(100 * bau_margin, 3), 'suffix': " p.p."},
+            value = round(100 * new_margin, 3),
+            number = {'suffix': " %"},
+            domain = {'row': 0, 'column': 1},
+            title="Margem Líquida Final"),
+        )
 
-            st.columns(8)[2].plotly_chart(fig, use_container_width=False)
+        fig.update_layout(
+         grid = {'rows': 2, 'columns': 2, 'pattern': "independent"},
+        )
 
-            # st.table(calc)
+        st.columns(8)[2].plotly_chart(fig, use_container_width=False)
+
+        # st.table(calc)
 
