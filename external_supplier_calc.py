@@ -15,17 +15,17 @@ def get_main_inputs():
     col1, col2 =  st.columns(2, gap="medium")
 
     with col1:
-        client_base = st.number_input("Número de clientes", min_value = 0,help="Insira a quantidade de clientes que transacionam com sua empresa mensalmente.",value=3000)
-        acquitisions_per_month = st.number_input("Novos clientes por mês", min_value = 0,help ="Insira a quantidade de novos clientes captados por mês.", value=30)
+        client_base = st.number_input("Número de clientes", min_value = 0,help="Número de clientes ativos transacionando por mês.",value=3000)
+        acquitisions_per_month = st.number_input("Novos clientes por mês", min_value = 0,help ="Número de novos clientes ativos por mês.", value=30)
          
 
     with col2:
-        average_monthly_spend = st.number_input("Spending médio mensal, em R$", min_value = 0.0, help ="Insira a média de valor gasto mensalmente pelos clientes na sua empresa.",value=1000.0, format="%f", step=100.)
-        creditless_base = st.number_input("Clientes sem crédito", min_value = 0,help="Insira a quantidade de clientes na sua base para os quais você não oferece nenhum tipo de crédito.", value=200)
+        average_monthly_spend = st.number_input("Spending médio mensal, em R$", min_value = 0.0, help ="Média de gastos dos seus clientes por mês.",value=1000.0, format="%f", step=100.)
+        creditless_base = st.number_input("Clientes sem crédito", min_value = 0,help="Número de clientes ativos que não possuem uma forma de crédito para pagamento.", value=200)
         
 
-    payment_term = st.selectbox("Prazo desejado", help="Insira o prazo desejado para o repasse das compras do Merchant para você.", options=[30, 60, 90])
-    liquid_margins = st.slider("Margem Líquida", help="Insira a margem líquida da sua operação.", min_value=-1.0, max_value=10.0, step=0.1, value=3., format="%f %%")
+    payment_term = st.selectbox("Prazo desejado", help="Número máximo de dias para repasse das compras do cliente para você.", options=[30, 60, 90])
+    liquid_margins = st.slider("Margem Líquida", help="Divisão do lucro líquido pela receita líquida.", min_value=-1.0, max_value=10.0, step=0.1, value=3., format="%f %%")
 
     return {
         "client_base": client_base,
