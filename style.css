@@ -1,0 +1,8 @@
+@import url('https://drive.google.com/file/d/1qrUIFfXxlfkTsZWYt9znToB-2XTx94O7/view?usp=drive_link'); 
+
+html, body, [class*="css"] {
+    font-family: 'my-font', sans-serif; 
+    font-size: 18px;
+    font-weight: 500;
+    color: #091747;
+}
