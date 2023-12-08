@@ -300,7 +300,7 @@ with st.form("my_form"):
         st.write("")
         st.write("")
 
-        st.link_button("FALAR COM ESPECIALISTA", "https://streamlit.io/gallery", type = "primary")
+        st.link_button("FALAR COM UM CONSULTOR", "https://wa.me/5511971624475?text=Ol%C3%A1%21+Quero+adotar+o+Tino+na+minha+empresa.+", type = "primary")
 
         # st.table(calc)
 
