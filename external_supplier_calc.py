@@ -3,33 +3,29 @@ import pandas as pd
 import numpy as np
 from PIL import Image
 import plotly.graph_objects as go
-# import socket
-## getting the hostname by socket.gethostname() method
-# hostname = socket.gethostname()
-## getting the IP address using socket.gethostbyname() method
-# ip_address = socket.gethostbyname(hostname)
-## printing the hostname and ip_address
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="centered")
+
+with open( "style.css" ) as css:
+    st.markdown( f'<style>{css.read()}</style>' , unsafe_allow_html= True)
+
 
 def get_main_inputs():
 
-    col1, col2, col3 =  st.columns(3, gap="medium")
+    col1, col2 =  st.columns(2, gap="medium")
 
     with col1:
-        client_base = st.number_input("Número de clientes", value=3000)
-        average_monthly_spend = st.number_input("Spending médio mensal", value=1000.0, format="%f", step=100.)
-        
+        client_base = st.number_input("Número de clientes", help="Insira a quantidade de clientes que transacionam com sua empresa mensalmente.",value=3000)
+        acquitisions_per_month = st.number_input("Novos clientes por mês",help ="Insira a quantidade de novos clientes captados por mês.", value=30)
+         
 
     with col2:
-        acquitisions_per_month = st.number_input("Novos clientes por mês", value=30)
-        creditless_base = st.number_input("Clientes sem crédito", value=200)
+        average_monthly_spend = st.number_input("Spending médio mensal, em R$", help ="Insira a média de valor gasto mensalmente pelos clientes na sua empresa.",value=1000.0, format="%f", step=100.)
+        creditless_base = st.number_input("Clientes sem crédito",help="Insira a quantidade de clientes na sua base para os quais você não oferece nenhum tipo de crédito.", value=200)
         
 
-
-    with col3:
-        payment_term = st.selectbox("Prazo desejado", [30, 60, 90])
-        liquid_margins = st.slider("Margem Líquida", min_value=-1.0, max_value=10.0, step=0.1, value=3., format="%f %%")
+    payment_term = st.selectbox("Prazo desejado", help="Insira o prazo desejado para o repasse das compras do Merchant para você.", options=[30, 60, 90])
+    liquid_margins = st.slider("Margem Líquida", help="Insira a margem líquida da sua operação.", min_value=-1.0, max_value=10.0, step=0.1, value=3., format="%f %%")
 
     return {
         "client_base": client_base,
@@ -85,7 +81,6 @@ def get_model_parameters():
     }
 
 def calculate_results():
-    # st.write(res['average_monthly_spend'])
 
 
     if res['average_monthly_spend'] <= 500:
@@ -101,7 +96,6 @@ def calculate_results():
     else:
         faixa_ticket_medio = 5
 
-    # st.write(faixa_ticket_medio)
 
 
     curva_spending = [[2, 1.5, 1.4, 1.12, 1.01, 1 ], 
@@ -117,7 +111,6 @@ def calculate_results():
          [2.4669, 1.65, 1.484, 1.1312, 1.01, 1],
          [2.4669, 1.65, 1.484, 1.1312, 1.01, 1]]
 
-    # st.write(curva_spending[0][1])
 
 
     ticket_medio_recusados = res['average_monthly_spend']*curva_spending[params['meses_para_pnl'] - 1][faixa_ticket_medio]
@@ -126,7 +119,6 @@ def calculate_results():
         ticket_medio_novos = ticket_medio_novos + res['average_monthly_spend']*curva_spending[i][faixa_ticket_medio]
 
     ticket_medio_novos = ticket_medio_novos/params['meses_para_pnl']
-    # st.write(ticket_medio_novos)
 
     receita = []
     cmv = []
@@ -143,38 +135,25 @@ def calculate_results():
     receita = np.append(receita, res['acquitisions_per_month']*params['meses_para_pnl']*ticket_medio_novos*params['taxa_apr_novos']*(1 + params['meses_para_pnl'])/2)
     receita = np.append(receita, res['creditless_base']*ticket_medio_recusados*params['taxa_apr_recus']*params['meses_para_pnl'])
     receita = np.append(receita, receita.sum())
-    # st.write(receita)
-
 
     perc_custo_produto = (1 - res['liquid_margins']/100)*(params['peso_custo_produto']/(params['peso_custo_produto']+params['peso_custo_operacao']+params['peso_outros_custos']))
     perc_custo_operacao = (1 - res['liquid_margins']/100)*(params['peso_custo_operacao']/(params['peso_custo_produto']+params['peso_custo_operacao']+params['peso_outros_custos']))
     perc_outros_custos = (1 - res['liquid_margins']/100)*(params['peso_outros_custos']/(params['peso_custo_produto']+params['peso_custo_operacao']+params['peso_outros_custos']))
 
-
-
-
-
-
-
     cmv = np.append(cmv, -receita[0]*perc_custo_produto)
     cmv = np.append(cmv, -receita[1]*perc_custo_produto)
     cmv = np.append(cmv, -receita[2]*perc_custo_produto)
     cmv = np.append(cmv, cmv.sum())
-    # st.write(cmv)
-
 
     margem_bruta = np.append(margem_bruta, receita[0]+cmv[0])
     margem_bruta = np.append(margem_bruta, receita[1]+cmv[1])
     margem_bruta = np.append(margem_bruta, receita[2]+cmv[2])
     margem_bruta = np.append(margem_bruta, receita[3]+cmv[3])
-    # st.write(margem_bruta)
 
     sgna_costs = np.append(sgna_costs, -0.75*receita[0]*perc_custo_operacao)
     sgna_costs = np.append(sgna_costs, -0.75*receita[1]*perc_custo_operacao)
     sgna_costs = np.append(sgna_costs, -0.75*receita[2]*perc_custo_operacao)
     sgna_costs = np.append(sgna_costs, -0.75*receita[3]*perc_custo_operacao)
-    # st.write(sgna_costs)
-
 
     if res['payment_term'] == 30:
         taxa_prazo = params['fee_30']/100
@@ -187,32 +166,26 @@ def calculate_results():
     credit_costs = np.append(credit_costs, -receita[1]*taxa_prazo)
     credit_costs = np.append(credit_costs, -receita[2]*taxa_prazo)
     credit_costs = np.append(credit_costs, credit_costs.sum())
-    # st.write(credit_costs)
 
     custos_ops = np.append(custos_ops, sgna_costs[0] + credit_costs[0])
     custos_ops = np.append(custos_ops, sgna_costs[1] + credit_costs[1])
     custos_ops = np.append(custos_ops, sgna_costs[2] + credit_costs[2])
     custos_ops = np.append(custos_ops, sgna_costs[3] + credit_costs[3])
-    # st.write(custos_ops)
 
     margem_op = np.append(margem_op, margem_bruta[0] + custos_ops[0])
     margem_op = np.append(margem_op, margem_bruta[1] + custos_ops[1])
     margem_op = np.append(margem_op, margem_bruta[2] + custos_ops[2])
     margem_op = np.append(margem_op, margem_bruta[3] + custos_ops[3])
-    # st.write(margem_op)
 
     outros_custos = np.append(outros_custos, -receita[0]*perc_outros_custos)
     outros_custos = np.append(outros_custos, -receita[1]*perc_outros_custos)
     outros_custos = np.append(outros_custos, -receita[2]*perc_outros_custos)
     outros_custos = np.append(outros_custos, outros_custos.sum())
-    # st.write(outros_custos)
 
     margem_liquida = np.append(margem_liquida, margem_op[0] + outros_custos[0])
     margem_liquida = np.append(margem_liquida, margem_op[1] + outros_custos[1])
     margem_liquida = np.append(margem_liquida, margem_op[2] + outros_custos[2])
     margem_liquida = np.append(margem_liquida, margem_liquida.sum())
-    # st.write(margem_liquida)
-
 
 
     return pd.DataFrame(
@@ -228,44 +201,38 @@ def calculate_results():
 
 
 
-image = Image.open('tino_logo.png')
-# st.sidebar.image(image, width = 112)
+# image = Image.open('tino_logo.png')
 
 
-custom_html = """
-<div class="banner">
-    <img src="https://htmlcolorcodes.com/assets/images/colors/sunset-orange-color-solid-background-1920x1080.png" alt="Banner Image">
-</div>
-<style>
-    .banner {
-        width: 100%;
-        height: 100%;
-        overflow: visible;
-    }
-    .banner img {
-        width: 100%;
-        height: 100%;
-        object-fit: fill;
-    }
-</style>
-"""
-# Display the custom HTML
-st.components.v1.html(custom_html)
+# custom_html = """
+# <div class="banner">
+#     <img src="https://htmlcolorcodes.com/assets/images/colors/sunset-orange-color-solid-background-1920x1080.png" alt="Banner Image">
+# </div>
+# <style>
+#     .banner {
+#         width: 100%;
+#         height: 100%;
+#         overflow: visible;
+#     }
+#     .banner img {
+#         width: 100%;
+#         height: 100%;
+#         object-fit: fill;
+#     }
+# </style>
+# """
+# # Display the custom HTML
+# st.components.v1.html(custom_html)
 
-st.columns(3)[1].title("Calculadora&nbsp;Tino")
 
-# st.write(f"Hostname: {hostname}")
-# st.write(f"IP Address: {ip_address}")
+button_style = {"color": "white"}
+st.markdown(f"""<style> div.stButton > button:first-child {{text-align: center;background-color: #ff5c54; color: {button_style['color']}; height: auto; width: 100%;padding-top: 10px; padding-bottom: 10px;}} </style>""", unsafe_allow_html=True)
 
-#main tab with inputs and results, mp_tab with model parameters
-# main_tab, mp_tab = st.tabs(["Principal", "Parâmetros modelo"])
 
-# with mp_tab:
 
-    
-    # st.write(params['fee_30'])
+# st.button("Mark Reviewed")
 
-# with main_tab:
+# st.columns(3)[1].title("Calculadora&nbsp;Tino")
 
 params = get_model_parameters()
 
@@ -276,7 +243,7 @@ with st.form("my_form"):
     calc = calculate_results()
     # st.write(params['fee_30'])
 
-    submitted = st.columns(5)[2].form_submit_button("Calcule&nbsp;Seus&nbsp;Resultados")
+    submitted = st.form_submit_button("**VEJA&nbsp;SEUS&nbsp;RESULTADOS**")
 
     
 
@@ -291,31 +258,49 @@ with st.form("my_form"):
     
 
     if submitted:
-        st.columns(5)[2].subheader("Resultados")
+        st.write("")
+        st.write("")
+        st.markdown("<p style='text-align: center;font-size: 50px;color: #324138;'>Resultados</p>", unsafe_allow_html=True)
+
 
         fig.add_trace(go.Indicator(
             mode = "number+delta",
-            delta = {'reference': round(bau_rev, 3), 'prefix': "R$ "},
+            delta = {'reference': round(bau_rev, 3), 'prefix': "R$ ", 'increasing':{'color': '#008f39'}, 'decreasing':{'color': '#fc0b0b'}},
             value = round(new_rev, 3),
             number = {'prefix': "R$ "},
             domain = {'row': 0, 'column': 0},
-            title="Receita Final"),
+            title="Receita Anual"),
         )
 
         fig.add_trace(go.Indicator(
             mode = "number+delta",
-            delta = {'reference': round(100 * bau_margin, 3), 'suffix': " p.p."},
+            delta = {'reference': round(100 * bau_margin, 3), 'suffix': " p.p.", 'increasing':{'color': '#008f39'}, 'decreasing':{'color': '#fc0b0b'}},
             value = round(100 * new_margin, 3),
             number = {'suffix': " %"},
             domain = {'row': 0, 'column': 1},
-            title="Margem Líquida Final"),
+            title="Margem Líquida Anual"),
         )
 
         fig.update_layout(
-         grid = {'rows': 2, 'columns': 2, 'pattern': "independent"},
+         grid = {'rows': 1, 'columns': 2, 'pattern': "independent"}, height = 200, margin=dict(l=20, r=20, t=70, b=20),font_color="#324138",
         )
 
-        st.columns(8)[2].plotly_chart(fig, use_container_width=False)
+
+        st.plotly_chart(fig,height=300 ,use_container_width=True)
+
+        st.write("---")
+
+        st.markdown("<p style='text-align: center;font-size: 60px;line-height: 60px;;color: #ff5c54;'>Com o Tino, você pode mais que dobrar as vendas!</p>", unsafe_allow_html=True)
+
+        st.markdown("<h6 style='width: 500px;margin: 0 auto; text-align: center; color: #324138;'>Você aumenta a frequência de compras e o ticket médio e o seu lojista garante mais crédito e prazo para pagar.</h6>", unsafe_allow_html=True)
+
+        button_style = {"color": "white"}
+        st.markdown(f"""<style> div.stLinkButton > a:first-child {{text-align: center;background-color: #324138; color: {button_style['color']}; height: auto; width: 100%;padding-top: 10px; padding-bottom: 10px;}} </style>""", unsafe_allow_html=True)
+
+        st.write("")
+        st.write("")
+
+        st.link_button("FALAR COM ESPECIALISTA", "https://streamlit.io/gallery", type = "primary")
 
         # st.table(calc)
 
