@@ -20,7 +20,7 @@ def get_main_inputs():
          
 
     with col2:
-        average_monthly_spend = st.number_input("Spending médio mensal, em R$", min_value = 0.0, help ="Média de gastos dos seus clientes por mês.",value=1000.0, format="%f", step=100.)
+        average_monthly_spend = st.number_input("Spending médio mensal, em R$", min_value = 0.0, help ="Média de gastos por cliente no mês.",value=1000.0, format="%f", step=100.)
         creditless_base = st.number_input("Clientes sem crédito", min_value = 0,help="Número de clientes ativos que não possuem uma forma de crédito para pagamento.", value=200)
         
 
