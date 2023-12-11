@@ -292,7 +292,9 @@ with st.form("my_form"):
 
         st.write("---")
 
-        st.markdown("<p style='text-align: center;font-size: 40px;line-height: 40px;color: #ff5c54;'>Com o Tino, você pode mais que dobrar as vendas!</p>", unsafe_allow_html=True)
+        st.markdown("<p style='width: 70%;margin: 0 auto; text-align: center;font-size: 40px;line-height: 40px;color: #ff5c54;'>Com o Tino, você pode mais que dobrar as vendas!</p>", unsafe_allow_html=True)
+
+        st.write("")
 
         st.markdown("<p style='width: 80%;margin: 0 auto; text-align: center;font-size: 18px;line-height: 30px; color: #324138;'>Você aumenta a frequência de compras e o ticket médio e o seu lojista garante mais crédito e prazo para pagar.</p>", unsafe_allow_html=True)
 
