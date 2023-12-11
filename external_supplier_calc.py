@@ -292,9 +292,9 @@ with st.form("my_form"):
 
         st.write("---")
 
-        st.markdown("<p style='text-align: center;font-size: 60px;line-height: 60px;;color: #ff5c54;'>Com o Tino, você pode mais que dobrar as vendas!</p>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center;font-size: 40px;line-height: 40px;color: #ff5c54;'>Com o Tino, você pode mais que dobrar as vendas!</p>", unsafe_allow_html=True)
 
-        st.markdown("<h6 style='width: 80%;margin: 0 auto; text-align: center; color: #324138;'>Você aumenta a frequência de compras e o ticket médio e o seu lojista garante mais crédito e prazo para pagar.</h6>", unsafe_allow_html=True)
+        st.markdown("<p style='width: 80%;margin: 0 auto; text-align: center;font-size: 18px;line-height: 30px; color: #324138;'>Você aumenta a frequência de compras e o ticket médio e o seu lojista garante mais crédito e prazo para pagar.</p>", unsafe_allow_html=True)
 
         button_style = {"color": "white"}
         st.markdown(f"""<style> div.stLinkButton > a:first-child {{text-align: center;background-color: #324138; color: {button_style['color']}; height: auto; width: 100%;padding-top: 10px; padding-bottom: 10px;}} </style>""", unsafe_allow_html=True)
